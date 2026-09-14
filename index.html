@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Vishesh Pawar — Interactive Portfolio</title>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;600;700;800;900&display=swap');
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#090b0b;touch-action:pan-y;overflow-x:hidden;color:#eeeae0;font-family:Inter,Arial,sans-serif;overflow-x:hidden}body.loading{overflow:hidden}
+#webgl{position:fixed;inset:0;z-index:0;pointer-events:none}.noise{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.045;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+#loader{position:fixed;inset:0;z-index:50;background:#090b0b;display:flex;align-items:center;justify-content:center;transition:opacity .8s,visibility .8s}.loaderInner{text-align:center}.loaderName{font-size:clamp(48px,10vw,120px);font-weight:900;letter-spacing:-.09em}.loaderLine{height:1px;background:#ff6b2c;width:0;margin:22px auto;transition:width 1.4s}.loaderSmall{font:10px "DM Mono";color:#777;letter-spacing:.18em}.loaded #loader{opacity:0;visibility:hidden}body.loaded{overflow-x:hidden;overflow-y:auto}
+nav{position:fixed;z-index:20;top:18px;left:50%;transform:translateX(-50%);width:min(94%,1180px);display:flex;justify-content:space-between;align-items:center;border:1px solid #ffffff1d;background:#080a0add;backdrop-filter:blur(20px);border-radius:99px;padding:9px 10px 9px 18px}.brand{font-weight:900;letter-spacing:-.06em}.brand b{color:#ff6a2c}.navlinks{display:flex;gap:4px}.navlinks a{font:10px "DM Mono";padding:9px 12px;color:#999;border-radius:99px}.navlinks a:hover{background:#eeeae0;color:#111}.availability{font:10px "DM Mono";border:1px solid #ffffff1b;border-radius:99px;padding:9px 12px;color:#bbb}
+main{position:relative;z-index:4;touch-action:pan-y}.hero{height:100svh;min-height:680px;display:flex;align-items:center;justify-content:center;text-align:center;position:relative;padding:100px 20px}.heroCopy{transform:translateY(5vh)}.eyebrow{font:10px "DM Mono";letter-spacing:.25em;color:#ff7138;text-transform:uppercase;margin-bottom:25px}.hero h1{font-size:clamp(70px,15vw,190px);line-height:.76;letter-spacing:-.1em;margin:0;text-transform:uppercase;text-shadow:0 10px 50px #000}.hero h1 span{color:#ff6b2c}.hero p{max-width:530px;margin:35px auto 0;color:#aaa;font-size:14px;line-height:1.7}.heroHint{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);font:10px "DM Mono";color:#777;letter-spacing:.14em}.mouse{width:16px;height:25px;border:1px solid #777;border-radius:99px;margin:10px auto 0;position:relative}.mouse:after{content:"";position:absolute;width:2px;height:5px;background:#ff6b2c;left:6px;top:5px;border-radius:5px;animation:wheel 1.5s infinite}@keyframes wheel{70%{transform:translateY(9px);opacity:0}}
+
+.sceneSection{min-height:145vh;position:relative;padding:15vh 6vw}.sceneTitle{position:sticky;top:25vh;height:0;z-index:5;pointer-events:none}.sceneTitle h2{font-size:clamp(54px,10vw,145px);line-height:.77;letter-spacing:-.095em;text-transform:uppercase;margin:0}.sceneTitle h2 span{color:#ff6b2c}.sceneTitle .micro{font:10px "DM Mono";color:#777;margin-bottom:15px;letter-spacing:.18em}.cards{position:relative;min-height:105vh}.card{position:absolute;z-index:8;width:min(270px,31vw);padding:18px;border:1px solid #ffffff1c;background:#101312d9;backdrop-filter:blur(16px);border-radius:18px;box-shadow:0 25px 80px #0008;opacity:0;transform:translateY(70px) rotate(0deg);transition:opacity .8s,transform 1s cubic-bezier(.16,1,.3,1)}.card.show{opacity:1;transform:translateY(0) rotate(var(--r))}.card:nth-child(1){left:3%;top:30%;--r:-4deg}.card:nth-child(2){right:3%;top:20%;--r:4deg}.card:nth-child(3){left:7%;top:53%;--r:3deg}.card:nth-child(4){right:7%;top:68%;--r:-3deg}.cardNo{font:9px "DM Mono";color:#ff6b2c}.card h3{font-size:22px;letter-spacing:-.05em;margin:12px 0 7px}.card p{font-size:11px;line-height:1.6;color:#929590;margin:0}.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:13px}.chip{font:8px "DM Mono";padding:6px 8px;border:1px solid #ffffff18;border-radius:99px;color:#aaa}
+.scrollText{height:130vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px}.scrollText h2{font-size:clamp(58px,11vw,150px);line-height:.78;letter-spacing:-.1em;margin:0;text-transform:uppercase}.scrollText h2 span{color:#ff6b2c}.scrollText p{font:11px "DM Mono";color:#777;margin-top:25px}
+
+.work{padding:120px 6vw}.sectionHead{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1px solid #ffffff18;padding-bottom:17px;margin-bottom:45px}.sectionHead small{font:10px "DM Mono";color:#ff6b2c;letter-spacing:.16em}.sectionHead h2{font-size:clamp(50px,8vw,110px);letter-spacing:-.08em;line-height:.8;margin:8px 0 0}.workGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.job{min-height:420px;border:1px solid #ffffff17;background:#0c0f0edb;border-radius:24px;padding:28px;display:flex;flex-direction:column;justify-content:space-between;transition:.5s}.job:hover{transform:translateY(-10px);border-color:#ff6b2c66}.jobDate{font:10px "DM Mono";color:#ff7138}.job h3{font-size:clamp(31px,4vw,57px);line-height:.9;letter-spacing:-.07em;margin:15px 0}.jobCompany{font:11px "DM Mono";color:#777}.job p,.job li{font-size:12px;line-height:1.7;color:#999}.job ul{padding-left:18px}
+.projectBlock{padding:90px 6vw 140px}.projectBox{border:1px solid #ffffff17;border-radius:28px;overflow:hidden;background:#0c0e0d}.projectVisual{height:530px;position:relative;overflow:hidden;background:radial-gradient(circle at 70% 40%,#4c261566,transparent 32%),linear-gradient(135deg,#10150f,#090a0a)}.projectVisual:before{content:"";position:absolute;inset:10% 7%;border:1px solid #ff6b2c20;border-radius:50%;transform:rotate(-20deg) scaleY(.55);box-shadow:0 0 0 50px #ff6b2c06,0 0 0 100px #ff6b2c03}.projectVisual h2{position:absolute;left:40px;bottom:42px;font-size:clamp(55px,10vw,145px);line-height:.75;letter-spacing:-.1em;margin:0}.projectVisual h2 span{color:#ff6b2c}.projectMeta{padding:28px;display:grid;grid-template-columns:1fr 2fr;gap:30px;border-top:1px solid #ffffff12}.projectMeta p{font-size:13px;line-height:1.7;color:#999;margin:0}
+.edu{padding:120px 6vw}.eduGrid{display:grid;grid-template-columns:1.4fr .6fr;gap:16px}.eduCard{border:1px solid #ffffff17;border-radius:24px;background:#0c0f0edb;padding:30px}.eduCard h3{font-size:34px;letter-spacing:-.06em;margin:35px 0 8px}.eduCard p{color:#999;font-size:12px;line-height:1.7}.score{font-size:42px;font-weight:800;margin-top:30px}.score small{font:9px "DM Mono";color:#777}
+.contact{min-height:90vh;padding:120px 6vw;display:flex;flex-direction:column;justify-content:center}.contact h2{font-size:clamp(56px,13vw,185px);line-height:.78;letter-spacing:-.09em;margin:15px 0 45px;text-transform:uppercase;max-width:100%;overflow-wrap:anywhere}.contact h2 span{color:#ff6b2c}.links{display:flex;gap:9px;flex-wrap:wrap}.links a{font:10px "DM Mono";border:1px solid #ffffff25;border-radius:99px;padding:13px 17px;color:#bbb}.links a:hover{background:#eeeae0;color:#111}
+footer{padding:28px 6vw 45px;border-top:1px solid #ffffff12;display:flex;justify-content:space-between;font:9px "DM Mono";color:#666}
+@media(max-width:760px){nav{top:10px}.availability{display:none}.navlinks a{padding:9px 7px;font-size:9px}.hero h1{font-size:22vw}.sceneSection{padding:12vh 20px}.sceneTitle{top:22vh}.card{width:44vw;padding:14px}.card h3{font-size:17px}.card p{font-size:9px}.workGrid,.eduGrid{grid-template-columns:1fr}.work,.projectBlock,.edu{padding-left:20px;padding-right:20px}.projectVisual{height:390px}.projectVisual h2{left:24px;bottom:30px}.projectMeta{grid-template-columns:1fr}.contact{padding:100px 20px}.contact h2{font-size:clamp(52px,18vw,110px);letter-spacing:-.085em;line-height:.8;max-width:100%;overflow-wrap:anywhere}footer{padding:25px 20px;flex-direction:column;gap:12px}}
+</style>
+</head>
+<body class="loading">
+<div id="loader"><div class="loaderInner"><div class="loaderName">VP<span style="color:#ff6b2c">.</span></div><div class="loaderLine"></div><div class="loaderSmall">LOADING EXPERIENCE / 2026</div></div></div>
+<div id="webgl"></div><div class="noise"></div>
+<nav><div class="brand">VISHESH<span>•</span></div><div class="navlinks"><a href="#skills">SKILLS</a><a href="#experience">EXPERIENCE</a><a href="#project">PROJECT</a><a href="#contact">CONTACT</a></div></nav>
+
+<main>
+<section class="hero">
+<div class="heroCopy">
+<div class="eyebrow">Software Engineer / Bhopal, India</div>
+<h1>VISHESH<br><span>PAWAR</span></h1>
+<p>Secure APIs. Scalable systems. Real-world engineering. Scroll to explore my work, stack and experience.</p>
+</div>
+<div class="heroHint">SCROLL TO BEGIN<div class="mouse"></div></div>
+</section>
+
+<section class="sceneSection" id="skills">
+<div class="sceneTitle"><div class="micro">01 / TECHNICAL EXPERTISE</div><h2>BUILDING<br><span>SECURE SYSTEMS</span></h2></div>
+<div class="cards">
+<article class="card"><div class="cardNo">01 / BACKEND</div><h3>Java Systems</h3><p>Reliable backend development with Java, XML and RESTful APIs, designed for high-volume financial traffic.</p><div class="chips"><span class="chip">JAVA</span><span class="chip">REST</span><span class="chip">SQL</span></div></article>
+<article class="card"><div class="cardNo">02 / FRONTEND</div><h3>React Interfaces</h3><p>Responsive enterprise interfaces using React.js, JavaScript ES6+, HTML5 and CSS3.</p><div class="chips"><span class="chip">REACT</span><span class="chip">HOOKS</span><span class="chip">CSS3</span></div></article>
+<article class="card"><div class="cardNo">03 / INFRA</div><h3>API & Events</h3><p>Open Banking APIs, API gateways and Kafka — connecting secure services and moving data efficiently.</p><div class="chips"><span class="chip">KAFKA</span><span class="chip">WSO2</span><span class="chip">OPEN BANKING</span></div></article>
+<article class="card"><div class="cardNo">04 / DELIVERY</div><h3>Ship Continuously</h3><p>Git and CI/CD pipelines across Linux and Windows environments for seamless delivery.</p><div class="chips"><span class="chip">GIT</span><span class="chip">CI/CD</span><span class="chip">LINUX</span></div></article>
+</div>
+</section>
+
+<section class="scrollText"><div><h2>TURN<br><span>IDEAS</span><br>INTO CODE.</h2><p>DSA · OOPS · PERFORMANCE · USER EXPERIENCE</p></div></section>
+
+<section class="work" id="experience">
+<div class="sectionHead"><div><small>02 / PROFESSIONAL EXPERIENCE</small><h2>PROFESSIONAL<br>EXPERIENCE.</h2></div><div style="font:10px 'DM Mono';color:#666">2023 — NOW</div></div>
+<div class="workGrid">
+<article class="job"><div><div class="jobDate">MAR 2025 — PRESENT</div><h3>System Engineer<br>(Java Developer)</h3><div class="jobCompany">TATA CONSULTANCY SERVICES · TCS</div></div><div><p>Develop and optimize secure Open Banking APIs for an Israel-based banking client.</p><ul><li>High-volume, low-latency RESTful APIs with API gateways.</li><li>Java, XML and JavaScript for reliable backend systems.</li><li>Git CI/CD across Linux and Windows environments.</li></ul></div></article>
+<article class="job"><div><div class="jobDate">JUN 2023 — AUG 2024</div><h3>Software Engineering<br>Intern</h3><div class="jobCompany">PERSISTENT SYSTEMS</div></div><div><p>Engineered dynamic, responsive front-end interfaces for enterprise applications.</p><ul><li>REST API integration and React Hooks state management.</li><li>Reusable, cross-browser React components from UI/UX wireframes.</li></ul></div></article>
+</div>
+</section>
+
+<section class="projectBlock" id="project"><div class="sectionHead"><div><small>03 / PROJECT</small><h2>ENGINEERED<br>TO PERFORM.</h2></div><div style="font:10px 'DM Mono';color:#666">01</div></div>
+<div class="projectBox"><div class="projectVisual"><div style="position:absolute;left:40px;top:35px;font:10px 'DM Mono';color:#ff7138">JAN 2024 — APR 2024 / LEAD DEVELOPER</div><h2>E‑COMMERCE<br><span>PLATFORM.</span></h2></div><div class="projectMeta"><div><div class="chips"><span class="chip">REACT.JS</span><span class="chip">FULL STACK</span><span class="chip">JWT</span><span class="chip">DATABASE</span></div></div><p>Built a robust full-stack e-commerce application focused on scalable architecture, responsive React.js front-end and secure JWT authentication. Optimized database queries and streamlined checkout processes to improve load times and user engagement.</p></div></div>
+</section>
+
+<section class="edu"><div class="sectionHead"><div><small>04 / EDUCATION</small><h2>THE<br>FOUNDATION.</h2></div></div><div class="eduGrid"><article class="eduCard"><div style="font:10px 'DM Mono';color:#ff7138">2020 — 2024</div><h3>B.Tech in Computer Science & Engineering</h3><p>Oriental Institute of Science and Technology<br>Bhopal, Madhya Pradesh</p><div class="score">8.23 <small>CGPA</small></div></article><article class="eduCard"><div style="font:10px 'DM Mono';color:#ff7138">HOLY CROSS CO-ED SCHOOL</div><h3>School</h3><p>12th Grade · 2020 · 82.2%</p><p>10th Grade · 74.2%</p></article></div></section>
+
+<section class="contact" id="contact"><div style="font:10px 'DM Mono';color:#ff7138">05 / GET IN TOUCH</div><h2>LET'S<br><span>CONNECT.</span></h2><div class="links"><a href="mailto:Pawarvishesh00@gmail.com">EMAIL</a><a href="https://github.com/visheshpawar" target="_blank">GITHUB</a><a href="https://linkedin.com/in/vishesh-pawar-983875219" target="_blank">LINKEDIN</a></div></section>
+</main>
+<footer><span>VISHESH PAWAR · SOFTWARE ENGINEER</span><span>JAVA · REACT · OPEN BANKING · APIs</span></footer>
+
+<script>
+/* ---------- INTRO ---------- */
+window.addEventListener('load',()=>{document.querySelector('.loaderLine').style.width='180px';setTimeout(()=>{document.body.classList.remove('loading');document.body.classList.add('loaded')},1100)});setTimeout(()=>{document.body.classList.remove('loading');document.body.classList.add('loaded')},3000);
+
+/* ---------- THREE.JS WORLD ---------- */
+const mount=document.getElementById('webgl');
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;mount.appendChild(renderer.domElement);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x090b0b);scene.fog=new THREE.FogExp2(0x090b0b,.055);
+const camera=new THREE.PerspectiveCamera(42,innerWidth/innerHeight,.1,100);camera.position.set(0,2.5,12);
+scene.add(new THREE.HemisphereLight(0xaeb9a0,0x15130f,1.4));
+const moon=new THREE.DirectionalLight(0xffd9bb,3);moon.position.set(-5,9,5);scene.add(moon);
+const orange=new THREE.PointLight(0xff5e28,18,18);orange.position.set(4,3,4);scene.add(orange);
+
+const world=new THREE.Group();scene.add(world);
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(45,45),new THREE.MeshStandardMaterial({color:0x111512,roughness:1}));ground.rotation.x=-Math.PI/2;ground.position.y=-2.25;world.add(ground);
+const grid=new THREE.GridHelper(40,35,0x273027,0x151a16);grid.position.y=-2.23;grid.material.opacity=.22;grid.material.transparent=true;world.add(grid);
+
+const bark=new THREE.MeshStandardMaterial({color:0x3a2c22,roughness:1}),leaf=new THREE.MeshStandardMaterial({color:0x293820,roughness:1}),darkLeaf=new THREE.MeshStandardMaterial({color:0x172316,roughness:1});
+const tree=new THREE.Group();world.add(tree);
+function branch(x,y,z,sx,sy,sz,rz){let m=new THREE.Mesh(new THREE.CylinderGeometry(.10*sx,.18*sx,sy,7),bark);m.position.set(x,y,z);m.rotation.z=rz;m.rotation.x=(Math.random()-.5)*.25;tree.add(m)}
+branch(0,-.8,0,2,5,2,0);
+branch(-.8,.4,0,1,3,1,.65);branch(.9,.6,.1,1,3,1,-.65);branch(-1.1,1.6,.2,.75,2.7,.75,.85);branch(1.2,1.9,0,.75,2.8,.75,-.85);
+for(let i=0;i<26;i++){let a=Math.random()*Math.PI*2,r=.5+Math.random()*2.5,y=.7+Math.random()*3.8;let s=.25+Math.random()*.5;let m=new THREE.Mesh(new THREE.IcosahedronGeometry(s,1),i%3?leaf:darkLeaf);m.position.set(Math.cos(a)*r,y,Math.sin(a)*r*.55);tree.add(m)}
+tree.position.set(0,-.2,-1.3);tree.scale.set(1.05,1.05,1.05);
+
+/* Katana */
+const sword=new THREE.Group();world.add(sword);
+const steel=new THREE.MeshStandardMaterial({color:0xdfe5e2,metalness:.92,roughness:.17});
+const darkSteel=new THREE.MeshStandardMaterial({color:0x202326,metalness:.75,roughness:.22});
+const gripMat=new THREE.MeshStandardMaterial({color:0x151515,roughness:.8});
+const blade=new THREE.Mesh(new THREE.BoxGeometry(.16,4.2,.045),steel);blade.position.y=2.1;blade.rotation.z=-.08;sword.add(blade);
+const tip=new THREE.Mesh(new THREE.ConeGeometry(.115,.35,4),steel);tip.position.set(.14,4.36,0);tip.rotation.z=-.08;sword.add(tip);
+const guard=new THREE.Mesh(new THREE.TorusGeometry(.42,.055,8,32),darkSteel);guard.scale.set(1,.34,1);guard.rotation.x=Math.PI/2;guard.position.y=-.12;sword.add(guard);
+const handle=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,1.65,16),gripMat);handle.position.y=-.92;handle.rotation.z=.0;sword.add(handle);
+const pommel=new THREE.Mesh(new THREE.SphereGeometry(.19,16,16),darkSteel);pommel.position.y=-1.78;sword.add(pommel);
+sword.position.set(3.8,-.4,1);sword.rotation.z=-.5;sword.rotation.x=.12;
+
+/* glowing particles */
+const pg=new THREE.BufferGeometry(),count=260,pa=new Float32Array(count*3);
+for(let i=0;i<count;i++){pa[i*3]=(Math.random()-.5)*16;pa[i*3+1]=Math.random()*9-2;pa[i*3+2]=(Math.random()-.5)*8}
+pg.setAttribute('position',new THREE.BufferAttribute(pa,3));const pts=new THREE.Points(pg,new THREE.PointsMaterial({color:0xff7540,size:.035,transparent:true,opacity:.55}));world.add(pts);
+
+/* skill orbs */
+const orbGroup=new THREE.Group();world.add(orbGroup);
+const orbMat=new THREE.MeshStandardMaterial({color:0xff6b2c,emissive:0x681b08,emissiveIntensity:3});
+['JAVA','REACT','API','KAFKA','CI'].forEach((_,i)=>{let o=new THREE.Mesh(new THREE.SphereGeometry(.11,16,16),orbMat);o.position.set(Math.cos(i*1.25)*3.1,1+Math.sin(i*1.4)*1.6,Math.sin(i*1.25)*1.8);orbGroup.add(o)});
+
+let scroll=0,targetScroll=0,mouseX=0,mouseY=0;
+addEventListener('scroll',()=>targetScroll=scrollY/(document.body.scrollHeight-innerHeight));
+addEventListener('pointermove',e=>{mouseX=(e.clientX/innerWidth-.5);mouseY=(e.clientY/innerHeight-.5)});
+function tick(){
+requestAnimationFrame(tick);scroll+=(targetScroll-scroll)*.055;
+const t=performance.now()*.001;
+camera.position.x+=(mouseX*1.1-camera.position.x)*.025;
+camera.position.y+=(2.5-mouseY*.8-camera.position.y)*.025;
+camera.position.z=12-scroll*3.3;
+tree.rotation.y=t*.055+scroll*2.2;
+tree.position.y=-.2-scroll*.9;
+sword.rotation.z=-.5+Math.sin(t*1.2)*.08+scroll*5.5;
+sword.rotation.y=scroll*2;
+sword.position.x=3.8-scroll*5.5;
+sword.position.y=-.4+Math.sin(t*1.3)*.12+scroll*1.4;
+orbGroup.rotation.y=-t*.18+scroll*4;
+pts.rotation.y=t*.018;pts.position.y=scroll*1.5;
+orange.position.x=3+Math.sin(t)*2;
+renderer.render(scene,camera);
+}
+tick();
+
+/* reveal skill cards based on their section's scroll */
+const cards=[...document.querySelectorAll('.card')];
+const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){cards.forEach((c,i)=>setTimeout(()=>c.classList.add('show'),i*150))}}),{threshold:.12});
+io.observe(document.querySelector('.cards'));
+addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()});
+</script>
+</body>
+</html>
